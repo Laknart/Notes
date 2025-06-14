@@ -135,7 +135,7 @@ class Controller:
 
     @staticmethod
     def validate_input(new_value):
-        return len(new_value) <= 12
+        return len(new_value) <= 50
 
     @staticmethod
     def clear_frame(frame):
