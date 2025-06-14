@@ -7,8 +7,8 @@ class Controller:
     def __init__(self):
         self.window_menu = WindowMenuNoteView(self)
         self.window_note = None
-        self.max_len_text = 15
-        self.max_len_title = 15
+        self.max_len_text = 12
+        self.max_len_title = 12
         self.table_name = "notes"
         self.notes_list = []
         self.db = sqlite3.connect("DataNote.db")
@@ -23,11 +23,11 @@ class Controller:
         if not self.table_exists(self.table_name):
             self.cursor_db.execute("""
             CREATE TABLE IF NOT EXISTS notes(
-                id INTEGER PRIMARY KEY,
-                title TEXT NOT NULL,
-                text_note TEXT NOT NULL
+            id INTEGER PRIMARY KEY,
+            title TEXT NOT NULL,
+            text_note TEXT NOT NULL
             );
-            """)
+                                   """)
         self.db.commit()
 
     def open_note_window(self):
@@ -60,10 +60,10 @@ class Controller:
             note.index = len(self.notes_list)
             note.id = row[0]
             self.notes_list.append(note)
-            note.data_frame = self.window_menu.add_frame(note.data_text.title, note.data_text.text,
+            note.data_frame = self.window_menu.add_frame(note.data_text.title[:self.max_len_title],
+                                                         note.data_text.text[:self.max_len_text],
                                                          note.index)
             note.data_frame.button.config(command=lambda n=note: self.open_note_window_2(n))
-
 
     def on_closing_window_menu(self):
         if self.window_menu.get_exit_window():
@@ -93,7 +93,8 @@ class Controller:
             self.set_title_text(note.data_text)
             note.index = len(self.notes_list)
             self.notes_list.append(note)
-            note.data_frame = self.window_menu.add_frame(note.data_text.title, note.data_text.text,
+            note.data_frame = self.window_menu.add_frame(note.data_text.title[:self.max_len_title],
+                                                         note.data_text.text[:self.max_len_text],
                                                          note.index)
             note.data_frame.button.config(command=lambda: self.open_note_window_2(note))
             self.window_note_destroy()
@@ -104,7 +105,7 @@ class Controller:
             id_note = note.id
             self.set_title_text(note.data_text)
             note.data_frame.label_text.config(text=note.data_text.text[:self.max_len_text])
-            note.data_frame.label_title.config(text=note.data_text.title)
+            note.data_frame.label_title.config(text=note.data_text.title[:self.max_len_title])
             self.window_note_destroy()
             self.cursor_db.execute("UPDATE notes SET title=?, text_note=? WHERE id=?", (title, text, id_note))
             self.db.commit()
@@ -119,7 +120,6 @@ class Controller:
             self.window_note_destroy()
             self.displacement_view_notes()
 
-
     def displacement_view_notes(self):
         for i, el in enumerate(self.notes_list):
             el.index = i
@@ -132,6 +132,10 @@ class Controller:
     def table_exists(self, table_name):
         self.cursor_db.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?", (table_name,))
         return self.cursor_db.fetchone() is not None
+
+    @staticmethod
+    def validate_input(new_value):
+        return len(new_value) <= 12
 
     @staticmethod
     def clear_frame(frame):

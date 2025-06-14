@@ -14,7 +14,8 @@ class WindowNoteView(Toplevel):
         self.resizable(width=False, height=False)
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=1)
-        self._entry_title = Entry(master=self, bd=3)
+        self._entry_title = Entry(master=self, bd=3, validate='key',
+                                  validatecommand=(self.register(self.controller.validate_input), "%P"))
         self._entry_title.grid(row=0, column=0, sticky="ew", padx=10, pady=10)
         self.set_title_entry(self._entry_title, "Title")
         self._field_text = Text(master=self, bd=3)
